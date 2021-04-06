@@ -38,6 +38,7 @@ class GoalDao implements Dao<Goal> {
 
   @override
   Map<String, dynamic> toMap(Goal object) {
+    object.creationDate = DateTime.now();
     return <String, dynamic>{
       columnId: object.id,
       _columnName: object.name,
