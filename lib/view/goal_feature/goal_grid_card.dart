@@ -84,8 +84,68 @@ class GoalCard extends StatelessWidget {
   }
 
   void _onNavigateToHabbitsList(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => HabbitsList(goal.habbits, goal.name)));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => HabbitsList(
+          // habbits: [
+          //   Habbit(
+          //     id: 1,
+          //     name: 'Wake up early',
+          //     description:
+          //         'I want to wake up early. Early for me is 7 o\'clock',
+          //     creationDate: DateTime.now().toUtc(),
+          //     alarmId: 1,
+          //     alarm: Alarm(
+          //       alarmType: AlarmType.daily,
+          //       id: 1,
+          //       dateTime: DateTime.now(),
+          //     ),
+          //   ),
+          //   Habbit(
+          //     id: 1,
+          //     name: 'asdasda up early',
+          //     description:
+          //         'I asdasdasdas to wake up early. Early for me is 7 o\'clock',
+          //     creationDate: DateTime.now().toUtc(),
+          //     alarmId: 1,
+          //     alarm: Alarm(
+          //       alarmType: AlarmType.daily,
+          //       id: 1,
+          //       dateTime: DateTime(2021, 04, 11, 12, 23, 23),
+          //     ),
+          //   ),
+          //   Habbit(
+          //     id: 1,
+          //     name: 'asdasda up early2',
+          //     description:
+          //         'I asdasdasdas to wake up early. Early for me is 7 o\'clock',
+          //     creationDate: DateTime.now().toUtc(),
+          //     alarmId: 1,
+          //     alarm: Alarm(
+          //       alarmType: AlarmType.daily,
+          //       id: 1,
+          //       dateTime: DateTime(2021, 04, 12, 12, 23, 23),
+          //     ),
+          //   ),
+          //   Habbit(
+          //     id: 1,
+          //     name: 'DateTime(2021, 04, 12, 12, 23, 23)',
+          //     description:
+          //         'I asdasdasdas to wake up early. Early for me is 7 o\'clock',
+          //     creationDate: DateTime.now().toUtc(),
+          //     alarmId: 1,
+          //     alarm: Alarm(
+          //       alarmType: AlarmType.daily,
+          //       id: 1,
+          //       dateTime: DateTime(2021, 05, 12, 12, 23, 23),
+          //     ),
+          //   ),
+          // ],
+          goalName: goal.name,
+          goalId: goal.id,
+        ),
+      ),
+    );
   }
 
   void _onGoalShowEditDialog(Goal goal, BuildContext context) {

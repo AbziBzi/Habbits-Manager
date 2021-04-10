@@ -6,6 +6,7 @@ import 'package:habbits_manager/infrastructure/repositories/abstract_goal_reposi
 import 'package:habbits_manager/infrastructure/repositories/goal_repository.dart';
 import 'package:habbits_manager/view/goal_feature/goal_create_form.dart';
 import 'package:habbits_manager/view/goal_feature/goal_grid_card.dart';
+import 'package:habbits_manager/view/my_app_bar.dart';
 
 class GoalList extends StatefulWidget {
   @override
@@ -26,7 +27,10 @@ class _GoalListState extends State<GoalList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _getAppBar(),
+      appBar: MyAppBar(
+        title: 'My Goals',
+        onAddFunction: _showGoalCreateForm,
+      ),
       body: _getGoalsGrid(_goals),
     );
   }
