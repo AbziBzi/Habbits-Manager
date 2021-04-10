@@ -8,7 +8,7 @@ class HabbitDao implements Dao<Habbit> {
   final _columnName = 'name';
   final _columnDescription = 'description';
   final _columnCreationDate = 'creationDate';
-  final _columnGoalId = 'goalId';
+  final columnGoalId = 'goalId';
   final _columnAlarmId = 'alarmId';
   final _columnGoal = 'goal';
   final _columnAlarm = 'alarm';
@@ -19,9 +19,9 @@ class HabbitDao implements Dao<Habbit> {
       " $_columnName TEXT NOT NULL,"
       " $_columnDescription TEXT,"
       " $_columnCreationDate INTEGER NOT NULL,"
-      " $_columnGoalId INTEGER NOT NULL,"
+      " $columnGoalId INTEGER NOT NULL,"
       " $_columnAlarmId INTEGER NOT NULL,"
-      " FOREIGN KEY ($_columnGoalId) REFERENCES $_columnGoal ($columnId),"
+      " FOREIGN KEY ($columnGoalId) REFERENCES $_columnGoal ($columnId),"
       " FOREIGN KEY ($_columnAlarmId) REFERENCES $_columnAlarm ($columnId)"
       ")";
 
@@ -51,12 +51,13 @@ class HabbitDao implements Dao<Habbit> {
 
   @override
   Map<String, dynamic> toMap(Habbit object) {
+    object.creationDate = DateTime.now();
     return <String, dynamic>{
       columnId: object.id,
       _columnName: object.name,
       _columnDescription: object.description,
       _columnCreationDate: object.creationDate.millisecondsSinceEpoch,
-      _columnGoalId: object.goalId,
+      columnGoalId: object.goalId,
       _columnAlarmId: object.alarmId
     };
   }
