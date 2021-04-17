@@ -97,4 +97,13 @@ class HabbitDatabaseRepository implements HabbitRepository {
       return habbits;
     }
   }
+
+  @override
+  Future<int> getHabbitsCount(int goalId) async {
+    List<Habbit> goalHabbits = await getAllGoalHabbits(goalId);
+    if (goalHabbits != null) {
+      return goalHabbits.length;
+    }
+    return 0;
+  }
 }

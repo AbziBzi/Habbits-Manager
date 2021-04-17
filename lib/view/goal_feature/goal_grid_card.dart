@@ -1,18 +1,27 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:habbits_manager/domain/models/goal.dart';
-import 'package:habbits_manager/domain/models/habbit.dart';
 import 'package:habbits_manager/infrastructure/repositories/abstract_goal_repository.dart';
+import 'package:habbits_manager/infrastructure/repositories/abstract_habbit_repository.dart';
 import 'package:habbits_manager/view/goal_feature/goal_delete_dialog.dart';
 import 'package:habbits_manager/view/goal_feature/goal_edit_form.dart';
 import 'package:habbits_manager/view/habbit_feature/habbit_list.dart';
 
-class GoalCard extends StatelessWidget {
+class GoalCard extends StatefulWidget {
   final Function() refreshGoalList;
   final Goal goal;
-  final GoalRepository repository;
+  final GoalRepository _goalRepository;
+  final HabbitRepository _habbitRepository;
 
-  GoalCard(this.goal, this.refreshGoalList, this.repository);
+  GoalCard(this.goal, this.refreshGoalList, this._goalRepository,
+      this._habbitRepository);
+
+  @override
+  _GoalCardState createState() => _GoalCardState();
+}
+
+class _GoalCardState extends State<GoalCard> {
+  int habbitsCount;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +39,7 @@ class GoalCard extends StatelessWidget {
                   Expanded(
                     flex: 3,
                     child: Text(
-                      goal.name,
+                      widget.goal.name,
                       textWidthBasis: TextWidthBasis.parent,
                       overflow: TextOverflow.visible,
                       style: TextStyle(
@@ -41,10 +50,10 @@ class GoalCard extends StatelessWidget {
                   PopupMenuButton(
                     onSelected: (result) {
                       if (result == 1) {
-                        _onGoalShowEditDialog(goal, context);
+                        _onGoalShowEditDialog(widget.goal, context);
                       }
                       if (result == 2) {
-                        _onShowDeleteDialog(goal, context);
+                        _onShowDeleteDialog(widget.goal, context);
                       }
                     },
                     itemBuilder: (BuildContext context) => <PopupMenuEntry>[
@@ -61,7 +70,7 @@ class GoalCard extends StatelessWidget {
                 ],
               ),
               Text(
-                goal.description,
+                widget.goal.description,
                 style: TextStyle(
                   fontSize: 14,
                 ),
@@ -69,7 +78,7 @@ class GoalCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 4.0),
                 child: Text(
-                  _getHabbitsCountString(goal.habbits).toUpperCase(),
+                  _getHabbitsCountString().toUpperCase(),
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 14,
@@ -87,62 +96,8 @@ class GoalCard extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => HabbitsList(
-          // habbits: [
-          //   Habbit(
-          //     id: 1,
-          //     name: 'Wake up early',
-          //     description:
-          //         'I want to wake up early. Early for me is 7 o\'clock',
-          //     creationDate: DateTime.now().toUtc(),
-          //     alarmId: 1,
-          //     alarm: Alarm(
-          //       alarmType: AlarmType.daily,
-          //       id: 1,
-          //       dateTime: DateTime.now(),
-          //     ),
-          //   ),
-          //   Habbit(
-          //     id: 1,
-          //     name: 'asdasda up early',
-          //     description:
-          //         'I asdasdasdas to wake up early. Early for me is 7 o\'clock',
-          //     creationDate: DateTime.now().toUtc(),
-          //     alarmId: 1,
-          //     alarm: Alarm(
-          //       alarmType: AlarmType.daily,
-          //       id: 1,
-          //       dateTime: DateTime(2021, 04, 11, 12, 23, 23),
-          //     ),
-          //   ),
-          //   Habbit(
-          //     id: 1,
-          //     name: 'asdasda up early2',
-          //     description:
-          //         'I asdasdasdas to wake up early. Early for me is 7 o\'clock',
-          //     creationDate: DateTime.now().toUtc(),
-          //     alarmId: 1,
-          //     alarm: Alarm(
-          //       alarmType: AlarmType.daily,
-          //       id: 1,
-          //       dateTime: DateTime(2021, 04, 12, 12, 23, 23),
-          //     ),
-          //   ),
-          //   Habbit(
-          //     id: 1,
-          //     name: 'DateTime(2021, 04, 12, 12, 23, 23)',
-          //     description:
-          //         'I asdasdasdas to wake up early. Early for me is 7 o\'clock',
-          //     creationDate: DateTime.now().toUtc(),
-          //     alarmId: 1,
-          //     alarm: Alarm(
-          //       alarmType: AlarmType.daily,
-          //       id: 1,
-          //       dateTime: DateTime(2021, 05, 12, 12, 23, 23),
-          //     ),
-          //   ),
-          // ],
-          goalName: goal.name,
-          goalId: goal.id,
+          goalName: widget.goal.name,
+          goalId: widget.goal.id,
         ),
       ),
     );
@@ -173,7 +128,7 @@ class GoalCard extends StatelessWidget {
   }
 
   void _onDeleteGoal(int id, BuildContext context) async {
-    var res = await repository.delete(id);
+    var res = await widget._goalRepository.delete(id);
     if (res > 0) {
       Flushbar(
         icon: Icon(
@@ -186,7 +141,7 @@ class GoalCard extends StatelessWidget {
         message: "Goal have been deleted.",
         duration: Duration(seconds: 3),
       )..show(context);
-      refreshGoalList();
+      widget.refreshGoalList();
     } else {
       Flushbar(
         icon: Icon(
@@ -203,7 +158,7 @@ class GoalCard extends StatelessWidget {
   }
 
   void _onEditGoal(Goal goal, BuildContext context) async {
-    var res = await repository.update(goal);
+    var res = await widget._goalRepository.update(goal);
     if (res > 0) {
       Flushbar(
         icon: Icon(
@@ -216,7 +171,7 @@ class GoalCard extends StatelessWidget {
         message: "Goal have been updated",
         duration: Duration(seconds: 3),
       )..show(context);
-      refreshGoalList();
+      widget.refreshGoalList();
     } else {
       Flushbar(
         icon: Icon(
@@ -232,16 +187,25 @@ class GoalCard extends StatelessWidget {
     }
   }
 
-  String _getHabbitsCountString(List<Habbit> habbits) {
-    if (habbits == null || habbits.isEmpty) {
+  String _getHabbitsCountString() {
+    _getHabbitsCount();
+    if (habbitsCount == 0) {
       return 'no habbits';
     } else {
-      var lengthString = habbits.length.toString();
-      if (habbits.length == 1) {
+      var lengthString = habbitsCount.toString();
+      if (habbitsCount == 1) {
         return lengthString + ' habbit';
       } else {
         return lengthString + ' habbits';
       }
     }
+  }
+
+  _getHabbitsCount() async {
+    int habbitsCount =
+        await widget._habbitRepository.getHabbitsCount(widget.goal.id);
+    setState(() {
+      this.habbitsCount = habbitsCount;
+    });
   }
 }

@@ -18,71 +18,70 @@ class _GoalEditFormState extends State<GoalEditForm> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: Stack(
-        children: [
-          Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  initialValue: widget.goal.name,
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(15.0),
-                  ),
-                  validator: (value) {
-                    if (value.isEmpty || value == null) {
-                      return 'Enter you\'r goal name';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) => setState(() => widget.goal.name = value),
+      content: Container(
+        width: 350,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                initialValue: widget.goal.name,
+                style: TextStyle(
+                  fontSize: 16,
                 ),
-                TextFormField(
-                  initialValue: widget.goal.description,
-                  maxLines: 5,
-                  minLines: 1,
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(15.0),
-                  ),
-                  validator: (value) {
-                    if (value.isEmpty || value == null) {
-                      return 'Enter you\'r goal description';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) =>
-                      setState(() => widget.goal.description = value),
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(15.0),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                        Colors.blue[300],
-                      ),
-                    ),
-                    onPressed: () {
-                      _updateGoal(_formKey.currentState.validate(), context);
-                    },
-                    child: Text(
-                      'Save',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+                validator: (value) {
+                  if (value.isEmpty || value == null) {
+                    return 'Enter your goal name';
+                  }
+                  return null;
+                },
+                onSaved: (value) => setState(() => widget.goal.name = value),
+              ),
+              TextFormField(
+                initialValue: widget.goal.description,
+                maxLines: 5,
+                minLines: 1,
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(15.0),
+                ),
+                validator: (value) {
+                  if (value.isEmpty || value == null) {
+                    return 'Enter your goal description';
+                  }
+                  return null;
+                },
+                onSaved: (value) =>
+                    setState(() => widget.goal.description = value),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                      Colors.blue[300],
                     ),
                   ),
-                )
-              ],
-            ),
+                  onPressed: () {
+                    _updateGoal(_formKey.currentState.validate(), context);
+                  },
+                  child: Text(
+                    'Save changes',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              )
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -101,7 +100,7 @@ class _GoalEditFormState extends State<GoalEditForm> {
         ),
         margin: EdgeInsets.all(8),
         borderRadius: BorderRadius.circular(8),
-        message: "There was an error creating new goal.",
+        message: "There was an error updating goal.",
         duration: Duration(seconds: 3),
       )..show(context);
     }

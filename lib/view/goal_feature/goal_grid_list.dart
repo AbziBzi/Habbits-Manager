@@ -2,8 +2,12 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:habbits_manager/domain/models/goal.dart';
 import 'package:habbits_manager/infrastructure/database/database_provider.dart';
+import 'package:habbits_manager/infrastructure/repositories/abstract_alarm_repository.dart';
 import 'package:habbits_manager/infrastructure/repositories/abstract_goal_repository.dart';
+import 'package:habbits_manager/infrastructure/repositories/abstract_habbit_repository.dart';
+import 'package:habbits_manager/infrastructure/repositories/alarm_repository.dart';
 import 'package:habbits_manager/infrastructure/repositories/goal_repository.dart';
+import 'package:habbits_manager/infrastructure/repositories/habbit_repository.dart';
 import 'package:habbits_manager/view/goal_feature/goal_create_form.dart';
 import 'package:habbits_manager/view/goal_feature/goal_grid_card.dart';
 import 'package:habbits_manager/view/my_app_bar.dart';
@@ -15,12 +19,17 @@ class GoalList extends StatefulWidget {
 
 class _GoalListState extends State<GoalList> {
   List<Goal> _goals = [];
-  GoalRepository _repository;
+  GoalRepository _goalRepository;
+  HabbitRepository _habbitRepository;
+  AlarmRepository _alarmRepository;
 
   @override
   void initState() {
     super.initState();
-    _repository = GoalDatabaseRepository(DatabaseProvider.get);
+    _goalRepository = GoalDatabaseRepository(DatabaseProvider.get);
+    _alarmRepository = AlarmDatabaseRepository(DatabaseProvider.get);
+    _habbitRepository =
+        HabbitDatabaseRepository(DatabaseProvider.get, _alarmRepository);
     _refreshGoalsList();
   }
 
@@ -36,14 +45,14 @@ class _GoalListState extends State<GoalList> {
   }
 
   _refreshGoalsList() async {
-    List<Goal> fetchedGoals = await _repository.getAllGoals();
+    List<Goal> fetchedGoals = await _goalRepository.getAllGoals();
     setState(() {
       _goals = fetchedGoals;
     });
   }
 
   _onCeateGoal(Goal goal) async {
-    var res = await _repository.insert(goal);
+    var res = await _goalRepository.insert(goal);
     if (res > 0) {
       Flushbar(
         icon: Icon(
@@ -72,38 +81,6 @@ class _GoalListState extends State<GoalList> {
     }
   }
 
-  Widget _getAppBar() {
-    return PreferredSize(
-      child: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Text('My Goals'),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom:
-                new Radius.elliptical(MediaQuery.of(context).size.width, 120.0),
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: IconButton(
-              icon: Icon(
-                Icons.add,
-                size: 30,
-              ),
-              onPressed: () => {
-                _showGoalCreateForm(),
-              },
-            ),
-          )
-        ],
-      ),
-      preferredSize: Size.fromHeight(80),
-    );
-  }
-
   void _showGoalCreateForm() {
     showDialog(
       context: context,
@@ -123,7 +100,8 @@ class _GoalListState extends State<GoalList> {
       gridDelegate:
           SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
       itemBuilder: (BuildContext context, int index) {
-        return GoalCard(goals[index], _refreshGoalsList, _repository);
+        return GoalCard(goals[index], _refreshGoalsList, _goalRepository,
+            _habbitRepository);
       },
     );
   }

@@ -10,4 +10,5 @@ abstract class HabbitRepository {
   Future<Habbit> getHabbitById(int id);
   Future<List<Habbit>> getAllHabbits();
   Future<List<Habbit>> getAllGoalHabbits(int goalId);
+  Future<int> getHabbitsCount(int goalId);
 }

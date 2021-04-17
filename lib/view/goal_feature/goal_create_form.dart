@@ -18,73 +18,71 @@ class _GoalCreateFormState extends State<GoalCreateForm> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: Stack(
-        children: [
-          Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'New Gaol Name',
-                    contentPadding: EdgeInsets.all(15.0),
-                    hintStyle: TextStyle(color: Colors.grey[300]),
-                  ),
-                  validator: (value) {
-                    if (value.isEmpty || value == null) {
-                      return 'Enter you\'r goal name';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) => setState(() => newGoal.name = value),
+      content: Container(
+        width: 350,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                style: TextStyle(
+                  fontSize: 16,
                 ),
-                TextFormField(
-                  maxLines: 5,
-                  minLines: 1,
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'New Goal Description',
-                    contentPadding: EdgeInsets.all(15.0),
-                    hintStyle: TextStyle(color: Colors.grey[300]),
-                  ),
-                  validator: (value) {
-                    if (value.isEmpty || value == null) {
-                      return 'Enter you\'r goal description';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) =>
-                      setState(() => newGoal.description = value),
+                decoration: InputDecoration(
+                  hintText: 'New Gaol Name',
+                  contentPadding: EdgeInsets.all(15.0),
+                  hintStyle: TextStyle(color: Colors.grey[300]),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                        Colors.blue[300],
-                      ),
-                    ),
-                    onPressed: () {
-                      _createGoal(_formKey.currentState.validate(), context);
-                    },
-                    child: Text(
-                      'Create',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+                validator: (value) {
+                  if (value.isEmpty || value == null) {
+                    return 'Enter your goal name';
+                  }
+                  return null;
+                },
+                onSaved: (value) => setState(() => newGoal.name = value),
+              ),
+              TextFormField(
+                maxLines: 5,
+                minLines: 1,
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'New Goal Description',
+                  contentPadding: EdgeInsets.all(15.0),
+                  hintStyle: TextStyle(color: Colors.grey[300]),
+                ),
+                validator: (value) {
+                  if (value.isEmpty || value == null) {
+                    return 'Enter your goal description';
+                  }
+                  return null;
+                },
+                onSaved: (value) => setState(() => newGoal.description = value),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                      Colors.blue[300],
                     ),
                   ),
-                )
-              ],
-            ),
+                  onPressed: () {
+                    _createGoal(_formKey.currentState.validate(), context);
+                  },
+                  child: Text(
+                    'Create',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              )
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
