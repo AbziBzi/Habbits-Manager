@@ -204,8 +204,10 @@ class _GoalCardState extends State<GoalCard> {
   _getHabbitsCount() async {
     int habbitsCount =
         await widget._habbitRepository.getHabbitsCount(widget.goal.id);
-    setState(() {
-      this.habbitsCount = habbitsCount;
-    });
+    if (this.mounted) {
+      setState(() {
+        this.habbitsCount = habbitsCount;
+      });
+    }
   }
 }

@@ -1,30 +1,42 @@
+import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:habbits_manager/utils/notificationsUtil.dart';
+import 'package:habbits_manager/view/alarm_feature/alarm_ring.dart';
 import 'package:habbits_manager/view/goal_feature/goal_grid_list.dart';
+import 'package:habbits_manager/view/habbit_feature/habbit_list.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 
-void printHello() {
-  // FlutterRingtonePlayer.play(
-  //   android: AndroidSounds.alarm,
-  //   ios: const IosSound(1023),
-  //   looping: true,
-  //   volume: 0.1,
-  //   asAlarm: true,
-  // );
+import 'homePage.dart';
+
+FlutterLocalNotificationsPlugin localNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+Future onSelectNotification(String payload) async {
+  await Navigator.push(
+    MyApp.navigatorKey.currentState.context,
+    MaterialPageRoute<void>(
+      builder: (BuildContext context) =>
+          AlarmRing(habbitId: int.parse(payload)),
+    ),
+  );
 }
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
+  await AndroidAlarmManager.initialize();
+  await initializeNotifications();
   runApp(MyApp());
-//   final int helloAlarmID = 0;
-//   await AndroidAlarmManager.initialize();
-//   await AndroidAlarmManager.periodic(
-//       const Duration(seconds: 20), helloAlarmID, printHello);
 }
 
 class MyApp extends StatelessWidget {
+  static final navigatorKey = new GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Named Routes Demo',
       theme: ThemeData(
         brightness: Brightness.dark,
         primaryColor: Color(0xFF481550),
@@ -33,10 +45,13 @@ class MyApp extends StatelessWidget {
           Theme.of(context).textTheme,
         ),
       ),
-      initialRoute: '/goallist',
+      home: HomePage(),
+      initialRoute: '/',
       routes: {
         '/goallist': (context) => GoalList(),
+        '/alarmring': (context) => AlarmRing(),
       },
+      navigatorKey: navigatorKey,
     );
   }
 }

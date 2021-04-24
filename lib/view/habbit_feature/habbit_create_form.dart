@@ -135,13 +135,13 @@ class _HabbitCreateFormState extends State<HabbitCreateForm> {
     );
   }
 
-  _onCreateHabbitAlarm(Alarm alarm) {
+  _onCreateHabbitAlarm(Alarm alarm) async {
     setState(() {
       newHabbit.alarm = alarm;
     });
   }
 
-  _createHabbit(bool isValid, BuildContext _context) {
+  _createHabbit(bool isValid, BuildContext _context) async {
     if (isValid) {
       if (newHabbit.alarm == null) {
         _showNullAlarmDialog();

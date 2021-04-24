@@ -1,6 +1,7 @@
 import 'package:habbits_manager/infrastructure/daos/alarm_dao.dart';
 import 'package:habbits_manager/infrastructure/daos/goal_dao.dart';
 import 'package:habbits_manager/infrastructure/daos/habbit_dao.dart';
+import 'package:habbits_manager/infrastructure/daos/doneAlarm_dao.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -26,6 +27,7 @@ class DatabaseProvider {
       await db.execute(GoalDao().createTableQuery);
       await db.execute(AlarmDao().createTableQuery);
       await db.execute(HabbitDao().createTableQuery);
+      await db.execute(DoneAlarmDao().createTableQuery);
     });
   }
 }

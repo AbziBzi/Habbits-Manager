@@ -1,27 +1,32 @@
+import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:habbits_manager/domain/models/alarm.dart';
 import 'package:habbits_manager/domain/models/habbit.dart';
 import 'package:habbits_manager/infrastructure/repositories/abstract_alarm_repository.dart';
 import 'package:habbits_manager/infrastructure/repositories/abstract_habbit_repository.dart';
+import 'package:habbits_manager/services/notification_service.dart';
 import 'package:habbits_manager/view/habbit_feature/habbit_delete_dialog.dart';
 import 'package:habbits_manager/view/habbit_feature/habbit_details.dart';
 import 'package:habbits_manager/view/habbit_feature/habbit_edit_form.dart';
 
 class HabbitListItem extends StatelessWidget {
-  final Function() _refreshHabbitsList;
-  final HabbitRepository repository;
+  final Function() refreshHabbitsList;
+  final HabbitRepository habbitRepository;
   final AlarmRepository alarmRepository;
   final Habbit habbit;
 
-  HabbitListItem(this.habbit, this.repository, this.alarmRepository,
-      this._refreshHabbitsList);
+  HabbitListItem(
+      {this.habbit,
+      this.habbitRepository,
+      this.alarmRepository,
+      this.refreshHabbitsList});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             flex: 3,
@@ -94,7 +99,7 @@ class HabbitListItem extends StatelessWidget {
   }
 
   void _onDeleteHabbit(int id, BuildContext context) async {
-    var res = await repository.delete(id);
+    var res = await habbitRepository.delete(id);
     if (res > 0) {
       Flushbar(
         icon: Icon(
@@ -107,7 +112,8 @@ class HabbitListItem extends StatelessWidget {
         message: "Habbit have been deleted.",
         duration: Duration(seconds: 3),
       )..show(context);
-      _refreshHabbitsList();
+      await _onCancelAndroidAlarm(id);
+      refreshHabbitsList();
     } else {
       Flushbar(
         icon: Icon(
@@ -125,7 +131,7 @@ class HabbitListItem extends StatelessWidget {
 
   void _onEditHabbit(Habbit habbit, BuildContext context) async {
     await _onEditHabbitAlarm(habbit.alarm, context);
-    var res = await repository.update(habbit);
+    var res = await habbitRepository.update(habbit);
     if (res > 0) {
       Flushbar(
         icon: Icon(
@@ -138,7 +144,9 @@ class HabbitListItem extends StatelessWidget {
         message: "Habbit have been updated",
         duration: Duration(seconds: 3),
       )..show(context);
-      _refreshHabbitsList();
+      await _onCancelAndroidAlarm(habbit.id);
+      await _onCreateAndroidAlarm(habbit);
+      refreshHabbitsList();
     } else {
       Flushbar(
         icon: Icon(
@@ -201,10 +209,20 @@ class HabbitListItem extends StatelessWidget {
           maxChildSize: 0.8,
           expand: false,
           builder: (_, controller) {
-            return HabbitDetails(habbit, _onEditHabbitAlarm);
+            return HabbitDetails(habbit);
           },
         );
       },
     );
+  }
+
+  Future<void> _onCancelAndroidAlarm(int id) async {
+    await AndroidAlarmManager.cancel(id);
+  }
+
+  Future<void> _onCreateAndroidAlarm(Habbit habbit) async {
+    await AndroidAlarmManager.oneShotAt(
+        habbit.alarm.dateTime, habbit.id, AlarmService.callback,
+        exact: true, wakeup: true, alarmClock: true, allowWhileIdle: true);
   }
 }

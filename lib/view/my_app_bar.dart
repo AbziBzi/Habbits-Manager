@@ -31,7 +31,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
               Icons.add,
               size: 30,
             ),
-            onPressed: () => onAddFunction(),
+            onPressed: () async => onAddFunction(),
           ),
         )
       ],

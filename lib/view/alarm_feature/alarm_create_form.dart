@@ -12,7 +12,8 @@ class AlarmCreateForm extends StatefulWidget {
 }
 
 class _AlarmCreateFormState extends State<AlarmCreateForm> {
-  TimeOfDay _time = TimeOfDay(hour: 7, minute: 00);
+  TimeOfDay _time =
+      TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +113,7 @@ class _AlarmCreateFormState extends State<AlarmCreateForm> {
   void _selectTime() async {
     final TimeOfDay newTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay(hour: 07, minute: 00),
+      initialTime: _time,
       builder: (BuildContext context, Widget child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
@@ -128,7 +129,7 @@ class _AlarmCreateFormState extends State<AlarmCreateForm> {
     }
   }
 
-  _onCreateAlarm() {
+  _onCreateAlarm() async {
     print('onCreateAlarm');
     DateTime now = DateTime.now();
     DateTime date =

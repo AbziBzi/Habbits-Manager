@@ -32,7 +32,7 @@ class QRCodeDownload extends StatelessWidget {
               child: FloatingActionButton(
                 backgroundColor: Color(0xFFfdb561),
                 onPressed: () {
-                  _onSave(qrData);
+                  _onSave(qrData, context);
                 },
                 child: Icon(
                   Icons.download_rounded,
@@ -47,7 +47,7 @@ class QRCodeDownload extends StatelessWidget {
   }
 
   String _getQRCodeData(Habbit habbit) {
-    return '${habbit.id}-${habbit.alarmId}';
+    return '${habbit.id}';
   }
 
   Future<String> createQrPicture(String qr) async {
@@ -87,7 +87,7 @@ class QRCodeDownload extends StatelessWidget {
         buffer.asUint8List(data.offsetInBytes, data.lengthInBytes));
   }
 
-  _onSave(String qrData) async {
+  _onSave(String qrData, BuildContext context) async {
     if (await Permission.storage.isPermanentlyDenied) {
       openAppSettings();
     } else if (await Permission.storage.request().isGranted) {
@@ -97,6 +97,7 @@ class QRCodeDownload extends StatelessWidget {
           mimeTypes: ["image/png"],
           subject: 'My QR code',
           text: 'Please scan me');
+      Navigator.pop(context);
     } else {
       Map<Permission, PermissionStatus> statuses = await [
         Permission.storage,

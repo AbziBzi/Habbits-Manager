@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:habbits_manager/domain/models/alarm.dart';
 import 'package:habbits_manager/domain/models/habbit.dart';
 import 'package:habbits_manager/view/alarm_feature/alarm_details.dart';
 import 'package:habbits_manager/view/qr_code_feature/qr_code_get.dart';
-import 'package:habbits_manager/view/qr_code_feature/qr_scan.dart';
 
 class HabbitDetails extends StatelessWidget {
-  final Function(Alarm alarm, BuildContext context) _onEditHabbitAlarm;
   final Habbit habbit;
 
-  HabbitDetails(this.habbit, this._onEditHabbitAlarm);
+  HabbitDetails(this.habbit);
 
   @override
   Widget build(BuildContext context) {
@@ -34,49 +31,57 @@ class HabbitDetails extends StatelessWidget {
                     ),
                     borderRadius: BorderRadius.vertical(
                       top: Radius.elliptical(
-                          MediaQuery.of(context).size.width, 120.0),
+                        MediaQuery.of(context).size.width,
+                        120.0,
+                      ),
                       bottom: Radius.elliptical(
-                          MediaQuery.of(context).size.width, 120.0),
+                        MediaQuery.of(context).size.width,
+                        120.0,
+                      ),
                     ),
                   ),
                 ),
               ),
               Align(
                 alignment: Alignment(0, -0.8),
-                child: Text(
-                  habbit.name,
-                  style: TextStyle(
-                    fontSize: 24,
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Text(
+                    habbit.name,
+                    style: TextStyle(
+                      fontSize: 24,
+                    ),
                   ),
                 ),
               ),
               Align(
                 alignment: Alignment(0, -0.40),
-                child: Text(
-                  habbit.description,
-                  maxLines: 3,
-                  style: TextStyle(
-                    fontSize: 16,
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Text(
+                    habbit.description,
+                    maxLines: 3,
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
               Align(
                 alignment: Alignment(0, 0.6),
-                child: AlarmDetails(habbit.alarm, _onEditHabbitAlarm),
+                child: AlarmDetails(habbit.alarm),
               )
             ],
           ),
         ),
         Column(
           children: [
-            ScanScreen(),
             Padding(
               padding: const EdgeInsets.all(50.0),
               child: FloatingActionButton.extended(
                 backgroundColor: Color(0xFFfdb561),
                 onPressed: () {
                   _onShowQRCode(habbit, context);
-                  // _createHabbit(_formKey.currentState.validate(), context);
                 },
                 label: const Text('Download QR code'),
               ),

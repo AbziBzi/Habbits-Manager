@@ -1,4 +1,6 @@
+import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:habbits_manager/domain/models/alarm.dart';
 import 'package:habbits_manager/domain/models/habbit.dart';
@@ -11,6 +13,7 @@ import 'package:habbits_manager/view/habbit_feature/habbit_create_form.dart';
 import 'package:habbits_manager/view/habbit_feature/habbit_list_item.dart';
 import 'package:habbits_manager/view/my_app_bar.dart';
 import 'package:habbits_manager/view/qr_code_feature/qr_code_get.dart';
+import 'package:habbits_manager/services/notification_service.dart';
 
 class HabbitsList extends StatefulWidget {
   final String goalName;
@@ -23,12 +26,6 @@ class HabbitsList extends StatefulWidget {
 }
 
 class _HabbitsListState extends State<HabbitsList> {
-  final List<String> timePeriods = [
-    'Today',
-    'Tomorrow',
-    'Later This Week',
-    'Others'
-  ];
   List<Habbit> _habbits = [];
   HabbitRepository _habbitRepository;
   AlarmRepository _alarmRepository;
@@ -73,7 +70,7 @@ class _HabbitsListState extends State<HabbitsList> {
         title: widget.goalName,
         onAddFunction: _showHabbitCreateForm,
       ),
-      body: _getBodySection(timePeriods, _habbits),
+      body: _getBodySection(_habbits),
     );
   }
 
@@ -85,98 +82,44 @@ class _HabbitsListState extends State<HabbitsList> {
     });
   }
 
-  Widget _getBodySection(List<String> timePeriods, List<Habbit> habbits) {
+  Widget _getBodySection(List<Habbit> habbits) {
+    if (habbits == null) {
+      return Center(
+          child: Text(
+        'No Habbits added',
+        style: TextStyle(
+          fontSize: 24,
+          color: Colors.black,
+        ),
+      ));
+    }
+
     return Container(
-      child: ListView.separated(
-        itemCount: timePeriods.length,
+      child: ListView.builder(
+        itemCount: habbits.length,
         itemBuilder: (context, i) {
-          return Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
-              title: Text(
-                timePeriods[i].toUpperCase(),
-                style: TextStyle(
-                  color: Colors.blue[300],
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 0),
+            child: Card(
+              child: InkWell(
+                onTap: () {},
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    HabbitListItem(
+                      habbit: habbits[i],
+                      habbitRepository: _habbitRepository,
+                      alarmRepository: _alarmRepository,
+                      refreshHabbitsList: _refreshHabbitsList,
+                    ),
+                  ],
                 ),
               ),
-              children: <Widget>[
-                Column(
-                  children: _getHabbits(_habbits, context, timePeriods[i]),
-                ),
-              ],
             ),
           );
         },
-        separatorBuilder: (BuildContext context, int index) => const Divider(),
       ),
     );
-  }
-
-  List<Widget> _getHabbits(
-      List<Habbit> habbits, BuildContext context, String timePeriod) {
-    List<Widget> columnContent = [];
-
-    if (habbits != null) {
-      for (Habbit habbit in habbits) {
-        if (habbit.alarm != null) {
-          switch (timePeriod) {
-            case "Today":
-              int daysDiffrence = 0;
-              if (habbitInPeriod(daysDiffrence, habbit.alarm.dateTime))
-                columnContent.add(HabbitListItem(habbit, _habbitRepository,
-                    _alarmRepository, _refreshHabbitsList));
-              break;
-            case "Tomorrow":
-              int daysDiffrence = 1;
-              if (habbitInPeriod(daysDiffrence, habbit.alarm.dateTime))
-                columnContent.add(HabbitListItem(habbit, _habbitRepository,
-                    _alarmRepository, _refreshHabbitsList));
-              break;
-            case "Later This Week":
-              if (_laterThisWeek(habbit.alarm.dateTime))
-                columnContent.add(HabbitListItem(habbit, _habbitRepository,
-                    _alarmRepository, _refreshHabbitsList));
-              break;
-            case "Others":
-              if (!_laterThisWeek(habbit.alarm.dateTime) &&
-                  dateDiffrence(habbit.alarm.dateTime) > 1)
-                columnContent.add(HabbitListItem(habbit, _habbitRepository,
-                    _alarmRepository, _refreshHabbitsList));
-              break;
-            default:
-          }
-        } else if (timePeriod == "Others") {
-          columnContent.add(HabbitListItem(habbit, _habbitRepository,
-              _alarmRepository, _refreshHabbitsList));
-        }
-      }
-    }
-    return columnContent;
-  }
-
-  bool _laterThisWeek(DateTime alarmDateTime) {
-    DateTime currentTime = DateTime.now();
-    if (dateDiffrence(alarmDateTime) < 7 &&
-        dateDiffrence(alarmDateTime) > 1 &&
-        (currentTime.weekday - alarmDateTime.weekday) <
-            (7 - currentTime.weekday)) {
-      return true;
-    }
-    return false;
-  }
-
-  bool habbitInPeriod(int dayDiffrence, DateTime alarmDateTime) {
-    if (dateDiffrence(alarmDateTime) == dayDiffrence) return true;
-    return false;
-  }
-
-  int dateDiffrence(DateTime date) {
-    DateTime now = DateTime.now();
-    return DateTime(date.year, date.month, date.day)
-        .difference(DateTime(now.year, now.month, now.day))
-        .inDays;
   }
 
   _onCeateHabbit(Habbit habbit) async {
@@ -197,6 +140,7 @@ class _HabbitsListState extends State<HabbitsList> {
         duration: Duration(seconds: 3),
       )..show(context);
       habbit.id = res;
+      await onCreateAndroidAlarm(habbit);
       _showQRCodeDownloadDialog(habbit);
       _refreshHabbitsList();
     } else {
@@ -228,6 +172,7 @@ class _HabbitsListState extends State<HabbitsList> {
         message: "New alarm have been created",
         duration: Duration(seconds: 3),
       )..show(context);
+      Navigator.pop(context);
       return res;
     } else {
       Flushbar(
@@ -243,6 +188,12 @@ class _HabbitsListState extends State<HabbitsList> {
       )..show(context);
       return 0;
     }
+  }
+
+  Future<void> onCreateAndroidAlarm(Habbit habbit) async {
+    await AndroidAlarmManager.oneShotAt(
+        habbit.alarm.dateTime, habbit.id, AlarmService.callback,
+        exact: true, wakeup: true, alarmClock: true, allowWhileIdle: true);
   }
 
   _showQRCodeDownloadDialog(Habbit habbit) {
